@@ -1,5 +1,5 @@
 import streamlit as st
-from st_canvas import st_canvas  # Paquete estable compatible con Streamlit Cloud
+from streamlit_drawable_canvas import st_canvas  # ✅ Import correcto
 
 # Configuración de la página
 st.set_page_config(page_title="Tablero para dibujo", layout="centered")
@@ -40,9 +40,9 @@ canvas_result = st_canvas(
     height=canvas_height,
     width=canvas_width,
     drawing_mode=drawing_mode,
-    key=f"canvas_{canvas_width}_{canvas_height}",  # Para evitar errores al cambiar tamaño
+    key=f"canvas_{canvas_width}_{canvas_height}",  # Evita errores de actualización
 )
 
-# Mostrar una nota
 st.markdown("🖍️ Usa el panel lateral para ajustar las herramientas y colores.")
+
 

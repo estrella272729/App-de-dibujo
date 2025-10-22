@@ -1,5 +1,5 @@
-streamlit>=1.18.0
-git+https://github.com/andfanilo/streamlit-drawable-canvas.git
+streamlit
+streamlit-drawable-canvas== 0.9.2
+openai
 pillow
 numpy
-altair<5

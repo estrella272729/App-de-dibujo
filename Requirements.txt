@@ -1,4 +1,4 @@
 streamlit
-git+https://github.com/andfanilo/streamlit-drawable-canvas.git
-pillow
+streamlit-drawable-canvas
+Pillow
 numpy

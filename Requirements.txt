@@ -1,4 +1,5 @@
 streamlit
-streamlit-drawable-canvas
-Pillow
+streamlit-drawable-canvas==0.9.3
 numpy
+Pillow
+altair<5

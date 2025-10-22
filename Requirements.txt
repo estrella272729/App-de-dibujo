@@ -1,4 +1,4 @@
 streamlit
-st-canvas
+streamlit-drawable-canvas
 pillow
 numpy

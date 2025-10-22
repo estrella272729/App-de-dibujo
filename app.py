@@ -1,27 +1,46 @@
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
-import numpy as np
 from PIL import Image
-import tensorflow as tf
+import io
+import base64
 
-st.title("🖌️ Tablero para dibujar y reconocer")
+# --- Configuración general ---
+st.set_page_config(page_title="🎨 Taller del Artista Digital", layout="centered")
+st.title("🎨 Taller del Artista Digital")
+st.write("Bienvenido a tu espacio creativo. Dibuja, explora y guarda tus obras.")
 
-# Propiedades del tablero
+# --- Sidebar con controles ---
 with st.sidebar:
-    st.subheader("Propiedades del Tablero")
-    canvas_width = st.slider("Ancho del tablero", 300, 700, 500, 50)
-    canvas_height = st.slider("Alto del tablero", 200, 600, 300, 50)
+    st.header("🧰 Propiedades del Lienzo")
+    
+    # Dimensiones
+    canvas_width = st.slider("Ancho del lienzo", 300, 1000, 600, 50)
+    canvas_height = st.slider("Alto del lienzo", 300, 800, 400, 50)
+    
+    # Herramienta
     drawing_mode = st.selectbox(
-        "Herramienta de Dibujo:",
-        ("freedraw", "line", "rect", "circle", "transform", "polygon", "point"),
+        "✏️ Herramienta de Dibujo",
+        ("freedraw", "line", "rect", "circle", "transform", "polygon", "point")
     )
-    stroke_width = st.slider("Selecciona el ancho de línea", 1, 30, 15)
-    stroke_color = st.color_picker("Color de trazo", "#FFFFFF")
-    bg_color = st.color_picker("Color de fondo", "#000000")
+    
+    # Grosor de línea
+    stroke_width = st.slider("Grosor del trazo", 1, 30, 5)
+    
+    # Color de línea
+    stroke_color = st.color_picker("🎨 Color del trazo", "#000000")
+    
+    # Fondo
+    bg_color = st.color_picker("🌈 Color de fondo", "#FFFFFF")
+    
+    # Botones de acción
+    st.markdown("---")
+    st.subheader("💾 Acciones")
+    save_btn = st.button("Guardar dibujo")
+    clear_btn = st.button("Limpiar lienzo")
 
-# Crear el lienzo
+# --- Crear el lienzo ---
 canvas_result = st_canvas(
-    fill_color="rgba(255, 165, 0, 0.3)",
+    fill_color="rgba(255, 165, 0, 0.2)",
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
@@ -31,19 +50,22 @@ canvas_result = st_canvas(
     key=f"canvas_{canvas_width}_{canvas_height}",
 )
 
-# Procesar el dibujo
-if canvas_result.image_data is not None:
-    img = Image.fromarray((canvas_result.image_data).astype("uint8"))
-    img = img.convert("L")  # convertir a blanco y negro
-    img = img.resize((28, 28))  # tamaño estándar para MNIST
-    img_array = np.array(img) / 255.0
-    img_array = img_array.reshape(1, 28, 28, 1)
+# --- Funciones extra ---
+if clear_btn:
+    st.experimental_rerun()
 
-    st.image(img, caption="Dibujo procesado", width=150)
+# Guardar imagen si se presiona el botón
+if save_btn and canvas_result.image_data is not None:
+    image = Image.fromarray(canvas_result.image_data.astype("uint8"), "RGBA")
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    byte_im = buf.getvalue()
+    b64 = base64.b64encode(byte_im).decode()
+    href = f'<a href="data:file/png;base64,{b64}" download="mi_obra.png">Descargar imagen 🎨</a>'
+    st.markdown(href, unsafe_allow_html=True)
+    st.success("¡Tu obra está lista para descargar!")
 
-    # Cargar modelo
-    model = tf.keras.models.load_model("modelo_dibujos.h5")
+# Texto motivacional
+st.markdown("---")
+st.info("✨ Consejo: Usa diferentes colores y formas para explorar tu creatividad.")
 
-    # Predicción
-    pred = model.predict(img_array)
-    st.write("🔮 Predicción:", np.argmax(pred))

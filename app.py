@@ -1,79 +1,40 @@
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
-from PIL import Image
-import io
-import base64
 
-# -------------------------------
-# CONFIGURACIÓN INICIAL
-# -------------------------------
-st.set_page_config(page_title="App de Dibujo Espacial 🎨🚀", layout="centered")
+st.title("Tablero para dibujo")
 
-st.title("🎨 Lienzo Espacial de Dibujo 🚀")
-st.markdown("""
-Bienvenido al **Laboratorio Creativo Espacial**.  
-Aquí puedes dibujar tus ideas, bocetar planetas o diseñar tu próxima nave intergaláctica.  
-Usa el lienzo interactivo de abajo y deja volar tu imaginación.
-""")
+with st.sidebar:
+    st.subheader("Propiedades del Tablero")
 
-# -------------------------------
-# CONTROLES LATERALES
-# -------------------------------
-st.sidebar.header("🎛️ Controles del Lienzo")
+    # Canvas dimensions (moved to the top)
+    st.subheader("Dimensiones del Tablero")
+    canvas_width = st.slider("Ancho del tablero", 300, 700, 500, 50)
+    canvas_height = st.slider("Alto del tablero", 200, 600, 300, 50)
 
-stroke_width = st.sidebar.slider("Grosor del pincel", 1, 25, 5)
-stroke_color = st.sidebar.color_picker("Color del pincel", "#00FFAA")
-bg_color = st.sidebar.color_picker("Color del fondo", "#000000")
+    # Drawing mode selector
+    drawing_mode = st.selectbox(
+        "Herramienta de Dibujo:",
+        ("freedraw", "line", "rect", "circle", "transform", "polygon", "point"),
+    )
 
-realtime_update = st.sidebar.checkbox("Actualizar en tiempo real", True)
-drawing_mode = st.sidebar.selectbox(
-    "Modo de dibujo", ("freedraw", "line", "rect", "circle", "transform")
-)
+    # Stroke width slider
+    stroke_width = st.slider("Selecciona el ancho de línea", 1, 30, 15)
 
-st.sidebar.markdown("---")
-st.sidebar.caption("💡 Consejo: usa el botón de abajo para limpiar o guardar tu dibujo.")
+    # Stroke color picker
+    stroke_color = st.color_picker("Color de trazo", "#FFFFFF")
 
-# -------------------------------
-# CANVAS DE DIBUJO
-# -------------------------------
+    # Background color
+    bg_color = st.color_picker("Color de fondo", "#000000")
+
+# Create a canvas component with dynamic key
 canvas_result = st_canvas(
-    fill_color="rgba(255, 255, 255, 0)",  # Relleno transparente
+    fill_color="rgba(255, 165, 0, 0.3)",
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
-    update_streamlit=realtime_update,
-    height=400,
-    width=600,
+    height=canvas_height,
+    width=canvas_width,
     drawing_mode=drawing_mode,
-    key="canvas",
+    key=f"canvas_{canvas_width}_{canvas_height}",  # Dynamic key based on dimensions
 )
-
-# -------------------------------
-# BOTONES DE ACCIÓN
-# -------------------------------
-col1, col2 = st.columns(2)
-
-# Limpiar el lienzo
-if col1.button("🧹 Limpiar Lienzo"):
-    st.experimental_rerun()
-
-# Guardar dibujo como imagen
-if col2.button("💾 Guardar Dibujo"):
-    if canvas_result.image_data is not None:
-        img = Image.fromarray((canvas_result.image_data).astype("uint8"))
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-        byte_im = buf.getvalue()
-        b64 = base64.b64encode(byte_im).decode()
-        href = f'<a href="data:file/png;base64,{b64}" download="dibujo_espacial.png">📥 Descargar tu dibujo</a>'
-        st.markdown(href, unsafe_allow_html=True)
-    else:
-        st.warning("Primero dibuja algo en el lienzo antes de guardar.")
-
-# -------------------------------
-# MENSAJE FINAL
-# -------------------------------
-st.markdown("---")
-st.caption("👩‍🚀 Creado para artistas espaciales con Streamlit y amor galáctico 💫")
-
 

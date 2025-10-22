@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_drawable_canvas import st_canvas  # ✅ Import correcto
+from streamlit_drawable_canvas import st_canvas  
 
 # Configuración de la página
 st.set_page_config(page_title="Tablero para dibujo", layout="centered")
